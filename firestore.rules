@@ -1,0 +1,139 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can only access their own user document
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      // Allow creation of user document during signup
+      allow create: if request.auth != null && 
+        request.auth.uid == userId &&
+        request.resource.data.uid == userId &&
+        request.resource.data.email == request.auth.token.email;
+    }
+    
+    // Organizations rules
+    match /organizations/{orgId} {
+      // Users can read organizations they are members of
+      allow read: if request.auth != null && 
+        request.auth.uid in resource.data.memberIds;
+      
+      // Only organization owners can write/update organizations
+      allow write: if request.auth != null && 
+        (request.auth.uid == resource.data.ownerId || 
+         request.auth.uid == request.resource.data.ownerId);
+      
+      // Allow creation if the user is setting themselves as owner
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.ownerId &&
+        request.auth.uid in request.resource.data.memberIds;
+    }
+    
+    // Organization invites
+    match /organizationInvites/{inviteId} {
+      // Users can read invites sent to their email
+      allow read: if request.auth != null && 
+        request.auth.token.email == resource.data.email;
+      
+      // Organization members can create invites
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.invitedBy;
+      
+      // Users can update invites sent to their email (to accept/decline)
+      allow update: if request.auth != null && 
+        request.auth.token.email == resource.data.email;
+    }
+    
+    // Leads rules
+    match /leads/{leadId} {
+      // Users can access leads if they belong to the same organization
+      allow read, write: if request.auth != null && (
+        // Legacy: user-based access
+        request.auth.uid == resource.data.uid ||
+        // New: organization-based access
+        (resource.data.organizationId != null && 
+         exists(/databases/$(database)/documents/organizations/$(resource.data.organizationId)) &&
+         request.auth.uid in get(/databases/$(database)/documents/organizations/$(resource.data.organizationId)).data.memberIds)
+      );
+      
+      // Allow creation if user is member of the organization
+      allow create: if request.auth != null && (
+        // Legacy: user creating their own lead
+        request.auth.uid == request.resource.data.uid ||
+        // New: user creating lead for their organization
+        (request.resource.data.organizationId != null && 
+         exists(/databases/$(database)/documents/organizations/$(request.resource.data.organizationId)) &&
+         request.auth.uid in get(/databases/$(database)/documents/organizations/$(request.resource.data.organizationId)).data.memberIds)
+      );
+    }
+    
+    // Products rules (similar to leads)
+    match /products/{productId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.userId;
+    }
+    
+    // General config rules
+    match /generalConfigs/{configId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.userId;
+    }
+    
+    // Valuation configs
+    match /valuationConfigs/{configId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.userId;
+    }
+    
+    // Quotes rules
+    match /quotes/{quoteId} {
+      // Users can access quotes if they belong to the same organization
+      allow read, write: if request.auth != null && (
+        // User owns the quote
+        request.auth.uid == resource.data.userId ||
+        // User is member of the organization
+        (resource.data.organizationId != null && 
+         exists(/databases/$(database)/documents/organizations/$(resource.data.organizationId)) &&
+         request.auth.uid in get(/databases/$(database)/documents/organizations/$(resource.data.organizationId)).data.memberIds)
+      );
+      
+      // Allow creation if user is member of the organization
+      allow create: if request.auth != null && (
+        // User creating their own quote
+        request.auth.uid == request.resource.data.userId &&
+        // User is member of the organization
+        (request.resource.data.organizationId != null && 
+         exists(/databases/$(database)/documents/organizations/$(request.resource.data.organizationId)) &&
+         request.auth.uid in get(/databases/$(database)/documents/organizations/$(request.resource.data.organizationId)).data.memberIds)
+      );
+    }
+    
+    // Billing Quotes rules (PandaDoc Quotes)
+    match /billing_quotes/{quoteId} {
+      // Users can access billing quotes if they belong to the same organization
+      allow read, write: if request.auth != null && (
+        // User owns the billing quote
+        request.auth.uid == resource.data.userId ||
+        // User is member of the organization
+        (resource.data.organizationId != null && 
+         exists(/databases/$(database)/documents/organizations/$(resource.data.organizationId)) &&
+         request.auth.uid in get(/databases/$(database)/documents/organizations/$(resource.data.organizationId)).data.memberIds)
+      );
+      
+      // Allow creation if user is member of the organization
+      allow create: if request.auth != null && (
+        // User creating their own billing quote
+        request.auth.uid == request.resource.data.userId &&
+        // User is member of the organization
+        (request.resource.data.organizationId != null && 
+         exists(/databases/$(database)/documents/organizations/$(request.resource.data.organizationId)) &&
+         request.auth.uid in get(/databases/$(database)/documents/organizations/$(request.resource.data.organizationId)).data.memberIds)
+      );
+    }
+  }
+}

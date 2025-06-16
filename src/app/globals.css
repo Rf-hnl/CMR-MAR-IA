@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Cloudhunt Dark Theme - Specific Shades for Kanban */
+    --background: 240 3% 11%; /* Page background (e.g. #1C1C1E) */
+    --foreground: 0 0% 98%; /* White #FAFAFA */
+
+    --card: 240 3% 16%; /* Kanban Column BG (e.g. #28282B) */
+    --card-foreground: 0 0% 98%; /* White */
+    
+    --muted: 240 2% 21%; /* Lead Card BG (e.g. #353538) */
+    --muted-foreground: 240 5% 65%; /* Light gray #A0A0A5 */
+
+    --popover: 240 3% 13%; /* Darker than lead cards, e.g. #1F2123 */
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 210 90% 55%; /* Blue Cian #3B82F6 */
+    --primary-foreground: 0 0% 98%;
+
+    /* Selected Lead Card BG (e.g. #1E1E1E or a subtle dark blue) */
+    --secondary: 240 3% 12%; 
+    --secondary-foreground: 0 0% 98%;
+
+    --accent: 210 90% 55%; /* Blue Cian */
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 75% 55%; /* Red #DB2727 */
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 4% 20%; /* Subtle Dark Gray #2E3033 - for general borders */
+    --input: 240 5% 15%;  /* Dark Gray Input BG #232628 */
+    --ring: 210 90% 60%; /* Lighter Blue for focus rings */
+
+    --radius: 5px;
+
+    /* Sidebar Specific Colors */
+    --sidebar-background: 240 3% 8%; /* Darkest #131415 */
+    --sidebar-foreground: 0 0% 90%; /* Light Gray #E5E5E5 */
+    --sidebar-primary: 0 0% 98%; /* White (for logo text) */
+    --sidebar-accent: 240 4% 15%; /* Active sidebar item BG #232628 or #252528 */
+    --sidebar-accent-foreground: 0 0% 98%; /* White */
+    --sidebar-border: 240 2% 10%; /* Subtle internal border #18191B */
+    --sidebar-ring: 210 90% 60%;
+
+    /* Chart colors - adapt to dark theme with one primary accent */
+    --chart-1: 210 90% 55%;  /* Blue */
+    --chart-2: 0 0% 60%;     /* Medium Gray */
+    --chart-3: 0 0% 45%;     /* Darker Gray */
+    --chart-4: 0 0% 30%;     /* Very Dark Gray */
+    --chart-5: 210 80% 65%;   /* Lighter Blue */
+  }
+
+  .dark {
+    /* Ensure dark theme variables also use these very dark values */
+    --background: 240 3% 11%;
+    --foreground: 0 0% 98%;
+    --card: 240 3% 16%; /* Kanban Column BG */
+    --card-foreground: 0 0% 98%;
+    --muted: 240 2% 21%; /* Lead Card BG */
+    --muted-foreground: 240 5% 65%;
+    --popover: 240 3% 13%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 210 90% 55%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 3% 12%; /* Selected Lead Card BG */
+    --secondary-foreground: 0 0% 98%;
+    --accent: 210 90% 55%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 63% 50%; /* Adjusted for slightly less intensity if needed */
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 4% 20%; 
+    --input: 240 5% 15%; 
+    --ring: 210 90% 60%;
+
+    --sidebar-background: 240 3% 8%;
+    --sidebar-foreground: 0 0% 90%;
+    --sidebar-primary: 0 0% 98%;
+    --sidebar-accent: 240 4% 15%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 240 2% 10%;
+    --sidebar-ring: 210 90% 60%;
+
+    --chart-1: 210 90% 55%;
+    --chart-2: 0 0% 60%;
+    --chart-3: 0 0% 45%;
+    --chart-4: 0 0% 30%;
+    --chart-5: 210 80% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border; 
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  }
+}
